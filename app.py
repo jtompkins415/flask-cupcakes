@@ -1,5 +1,6 @@
 """Flask app for Cupcakes"""
 
+import re
 from flask import Flask, render_template, redirect, session, flash, request, jsonify
 from models import db, connect_db, Cupcake
 
@@ -68,3 +69,33 @@ def create_cupcake():
 
     return jsonify(cupcake=serialize_cupcake(new_cupcake)), 201
 
+@app.route('/api/cupcakes/<int:cupcake_id>', methods=['PATCH'])
+def update_cupcake(cupcake_id):
+    '''Update Cupcake instance and return JSON data'''
+
+    cake = Cupcake.query.get_or_404(cupcake_id)
+
+    cake.flavor = request.json.get('flavor', cake.flavor)
+    cake.size = request.json.get('size', cake.size)
+    cake.rating = request.json.get('rating', cake.rating)
+    image = None
+
+    if 'image' in request.json:
+        image = request.json['image']
+
+    
+    db.session.add(cake)
+    db.session.commit()
+
+    return jsonify(cupcake=serialize_cupcake(cake)), 200
+
+@app.route('/api/cupcakes/<int:cupcake_id>', methods=['DELETE'])
+def delete_cupcake(cupcake_id): 
+    '''Delete Cupcake instance from DB'''
+
+    cake = Cupcake.query.get_or_404(cupcake_id)
+
+    db.session.delete(cake)
+    db.session.commit()
+
+    return jsonify(message = 'Cupcake deleted!')
