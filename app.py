@@ -78,11 +78,7 @@ def update_cupcake(cupcake_id):
     cake.flavor = request.json.get('flavor', cake.flavor)
     cake.size = request.json.get('size', cake.size)
     cake.rating = request.json.get('rating', cake.rating)
-    image = None
-
-    if 'image' in request.json:
-        image = request.json['image']
-
+    
     
     db.session.add(cake)
     db.session.commit()
